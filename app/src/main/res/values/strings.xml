@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">MyPhotoCollections</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string-array name="photo_categories">
+        <item>Nature</item>
+        <item>Landscape</item>
+        <item>Portrait</item>
+        <item>Urban</item>
+        <item>Wildlife</item>
+        <item>Macro</item>
+        <item>Black &amp; White</item>
+        <item>Aerial</item>
+        <item>Night</item>
+        <item>Architecture</item>
+        <item>Abstract</item>
+        <item>Fashion</item>
+        <item>Food</item>
+        <item>Documentary</item>
+        <item>Street</item>
+        <item>Sports</item>
+        <item>Travel</item>
+        <item>Events</item>
+        <item>Underwater</item>
+        <item>Minimalism</item>
+        <item>Fine Art</item>
+        <item>Conceptual</item>
+        <item>Product</item>
+        <item>Pet</item>
+    </string-array>
+</resources>

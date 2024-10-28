@@ -1,0 +1,70 @@
+[
+  {
+    "name": "Nature",
+    "photoId": 459335
+  },
+  {
+    "name": "Urban",
+    "photoId": 1570264
+  },
+  {
+    "name": "Wildlife",
+    "photoId": 219906
+  },
+  {
+    "name": "Macro",
+    "photoId": 62289
+  },
+  {
+    "name": "BlackWhite",
+    "photoId": 27742692
+  },
+  {
+    "name": "Aerial",
+    "photoId": 1612461
+  },
+  {
+    "name": "Night",
+    "photoId": 2670898
+  },
+  {
+    "name": "Architecture",
+    "photoId": 1662159
+  },
+  {
+    "name": "Fashion",
+    "photoId": 1021693
+  },
+  {
+    "name": "Food",
+    "photoId": 1109197
+  },
+  {
+    "name": "Sports",
+    "photoId": 2834917
+  },
+  {
+    "name": "Travel",
+    "photoId": 1051075
+  },
+  {
+    "name": "Events",
+    "photoId": 1114425
+  },
+  {
+    "name": "Underwater",
+    "photoId": 2446439
+  },
+  {
+    "name": "Minimalism",
+    "photoId": 2027697
+  },
+  {
+    "name": "Product",
+    "photoId": 3270222
+  },
+  {
+    "name": "Pet",
+    "photoId": 220938
+  }
+]
