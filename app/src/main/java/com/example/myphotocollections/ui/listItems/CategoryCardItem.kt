@@ -59,7 +59,7 @@ fun CategoryCardItem(
                     .fillMaxWidth()
                     .fillMaxHeight()
             )
-            BodyText(modifier = Modifier.background(Color.Black).padding(8.dp).fillMaxWidth(),categoryName, textColor = Color.White, TextAlign.Center)
+            BodyText(modifier = Modifier.background(MaterialTheme.colorScheme.onBackground).padding(16.dp).fillMaxWidth(),categoryName, textColor = Color.White, TextAlign.Center)
         }
     }
 }
