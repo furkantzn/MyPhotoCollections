@@ -24,7 +24,7 @@ fun GradientText(text: String,modifier: Modifier,textAlign: TextAlign) {
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
             brush = Brush.linearGradient(
-                colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.background) // Gradient colors
+                colors = listOf(MaterialTheme.colorScheme.onPrimary, MaterialTheme.colorScheme.background) // Gradient colors
             )
         ),
     )
@@ -34,13 +34,13 @@ fun GradientText(text: String,modifier: Modifier,textAlign: TextAlign) {
 fun BodyText(
     modifier: Modifier = Modifier,
     text: String,
-    textColor: Color = MaterialTheme.colorScheme.secondary,
+    textColor: Color = MaterialTheme.colorScheme.onPrimary,
     textAlign: TextAlign = TextAlign.Start
 ) {
     Text(
         text = text,
         textAlign = textAlign,
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.bodyLarge,
         color = textColor,
         modifier = modifier
     )

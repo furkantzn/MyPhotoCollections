@@ -1,5 +1,6 @@
 package com.example.myphotocollections.ui.pages
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -45,7 +47,9 @@ fun HomePage(navController: NavController, viewModel: HomePageViewModel = viewMo
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
             GradientText(
                 text = "Trending Photos",
@@ -61,6 +65,7 @@ fun HomePage(navController: NavController, viewModel: HomePageViewModel = viewMo
                 content = {
                     items(photos.size) { index ->
                         PhotoCardItem(
+                            navController,
                             photo = photos[index]
                         )
                     }

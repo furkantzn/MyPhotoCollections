@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.myphotocollections.ui.pages.CategoryDetailPage
 import com.example.myphotocollections.ui.pages.NavigationPage
+import com.example.myphotocollections.ui.pages.PhotoDetailPage
 
 @Composable
 fun SetUpNavHost(navController: NavHostController){
@@ -22,6 +23,15 @@ fun SetUpNavHost(navController: NavHostController){
             val categoryName = backStackEntry.arguments?.getString("categoryName")
             if (categoryName != null) {
                 CategoryDetailPage(navController = navController, categoryName = categoryName )
+            }
+        }
+
+        composable(route=Destinations.PhotoDetailPage){
+                backStackEntry ->
+            val photoIdString = backStackEntry.arguments?.getString("photoId")
+            val photoId = photoIdString?.toInt()
+            if (photoId != null) {
+                PhotoDetailPage(photoId = photoId )
             }
         }
     }

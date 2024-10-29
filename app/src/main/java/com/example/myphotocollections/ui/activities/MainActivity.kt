@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
-import com.example.myphotocollections.ui.activities.ui.theme.MyPhotoCollectionsTheme
+import com.example.myphotocollections.ui.theme.MyPhotoCollectionsTheme
 import com.example.myphotocollections.ui.navigation.SetUpNavHost
 
 class MainActivity : ComponentActivity() {

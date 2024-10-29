@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.myphotocollections.ui.activities.ui.theme.MyPhotoCollectionsTheme
+import com.example.myphotocollections.ui.theme.MyPhotoCollectionsTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -44,7 +44,7 @@ fun NavigationPage(navController: NavController) {
         bottomBar = {
             NavigationBar(
                 modifier = Modifier.height(64.dp),
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 NavigationBarItem(
                     icon = {
@@ -56,8 +56,8 @@ fun NavigationPage(navController: NavController) {
                     selected = selectedIndex == 0,
                     onClick = { selectedIndex = 0 },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedIconColor = Color.White,
                         indicatorColor = Color.Transparent
                     )
 
@@ -72,8 +72,8 @@ fun NavigationPage(navController: NavController) {
                     selected = selectedIndex == 1,
                     onClick = { selectedIndex = 1 },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedIconColor = Color.White,
                         indicatorColor = Color.Transparent
                     )
                 )
@@ -87,8 +87,8 @@ fun NavigationPage(navController: NavController) {
                     selected = selectedIndex == 2,
                     onClick = { selectedIndex = 2 },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                        selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                        unselectedIconColor = Color.White,
                         indicatorColor = Color.Transparent
                     )
                 )
