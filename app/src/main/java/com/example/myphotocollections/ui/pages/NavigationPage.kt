@@ -110,6 +110,7 @@ fun NavigationPage(navController: NavController) {
                     }
 
                     2 -> {
+                        FavoritesPage(navController = navController)
                     }
                 }
             }

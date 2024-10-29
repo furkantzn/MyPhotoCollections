@@ -7,12 +7,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.rememberNavController
+import com.example.myphotocollections.data.services.SharedPrefManager
 import com.example.myphotocollections.ui.theme.MyPhotoCollectionsTheme
 import com.example.myphotocollections.ui.navigation.SetUpNavHost
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        SharedPrefManager.init(this)
         setContent {
             MyApp()
         }

@@ -1,6 +1,5 @@
 package com.example.myphotocollections.ui.pages
 
-import android.provider.ContactsContract.Contacts.Photo
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +19,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -51,13 +48,9 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
     val showingDetails = remember {
         mutableStateOf(true)
     }
-    val favoriteImageVector = if (isFavorited.value) {
-        ImageVector.vectorResource(id = R.drawable.ic_favorited)
-    } else {
-        ImageVector.vectorResource(id = R.drawable.ic_unfavoried)
-    }
     LaunchedEffect(Unit) {
         isLoading.value = true
+        isFavorited.value = viewModel.getListFromPref().contains(photoId)
         viewModel.getPhotoDetail(photoId) { success, photo ->
             if (success) {
                 if (photo != null) {
@@ -70,7 +63,11 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
             isLoading.value = false
         }
     }
-
+    val favoriteImageVector = if (isFavorited.value) {
+        ImageVector.vectorResource(id = R.drawable.ic_favorited)
+    } else {
+        ImageVector.vectorResource(id = R.drawable.ic_unfavoried)
+    }
     if (isLoading.value) {
         DialogProgress(isLoading.value)
     } else {
@@ -136,7 +133,31 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                             modifier = Modifier
                                 .weight(1f)
                                 .clickable {
-                                    isFavorited.value = !isFavorited.value
+                                    if (!isFavorited.value) {
+                                        val favoritePhotos =
+                                            viewModel
+                                                .getListFromPref()
+                                                .toMutableList()
+                                        favoritePhotos.add(photoId)
+                                        viewModel.setFavoritePhotoIdsToPref(favoritePhotos) { success ->
+                                            if (success) {
+                                                isFavorited.value = true
+                                                println("Success!")
+                                            }
+                                        }
+                                    } else {
+                                        val favoritePhotos =
+                                            viewModel
+                                                .getListFromPref()
+                                                .toMutableList()
+                                        favoritePhotos.remove(photoId)
+                                        viewModel.setFavoritePhotoIdsToPref(favoritePhotos) { success ->
+                                            if (success) {
+                                                isFavorited.value = false
+                                                println("Success!")
+                                            }
+                                        }
+                                    }
                                 },
                             imageVector = favoriteImageVector,
                             contentDescription = "Add to Favorite"
