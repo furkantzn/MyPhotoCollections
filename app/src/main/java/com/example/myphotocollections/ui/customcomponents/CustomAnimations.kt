@@ -31,3 +31,25 @@ fun AnimatedPreloader(modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
+
+@Composable
+fun AnimatedDownloadImage(modifier: Modifier = Modifier) {
+    val preloaderLottieComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(
+            R.raw.animation_download_image
+        )
+    )
+
+    val preloaderProgress by animateLottieCompositionAsState(
+        preloaderLottieComposition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
+
+
+    LottieAnimation(
+        composition = preloaderLottieComposition,
+        progress = preloaderProgress,
+        modifier = modifier
+    )
+}

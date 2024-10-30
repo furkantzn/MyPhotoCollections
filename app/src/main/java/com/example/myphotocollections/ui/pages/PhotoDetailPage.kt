@@ -1,5 +1,7 @@
 package com.example.myphotocollections.ui.pages
 
+import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,10 +14,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,12 +40,20 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.myphotocollections.R
 import com.example.myphotocollections.ui.customcomponents.BodyText
+import com.example.myphotocollections.ui.customcomponents.DialogDownloadProgress
 import com.example.myphotocollections.ui.customcomponents.DialogProgress
+import com.example.myphotocollections.ui.customcomponents.ShowResultWithSnack
 import com.example.myphotocollections.ui.viewmodel.PhotoDetailPageViewModel
+import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewModel()) {
+    val snackState = remember { SnackbarHostState() }
+    val snackScope = rememberCoroutineScope()
     val isLoading = remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val fileName = "${photoId}.jpg"
     val photoUrl = remember {
         mutableStateOf("")
     }
@@ -48,7 +66,11 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
     val showingDetails = remember {
         mutableStateOf(true)
     }
-    LaunchedEffect(Unit) {
+    val isDownloadingImage = remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(photoId) {
         isLoading.value = true
         isFavorited.value = viewModel.getListFromPref().contains(photoId)
         viewModel.getPhotoDetail(photoId) { success, photo ->
@@ -58,113 +80,168 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                     photographer.value = photo.photographer
                 }
             } else {
-                println("Photo could not load!")
+                snackScope.launch {
+                    snackState.showSnackbar(
+                        "Photo could not load! Check your internet connection!",
+                        duration = SnackbarDuration.Indefinite,
+                        withDismissAction = true
+                    )
+                }
             }
             isLoading.value = false
         }
     }
-    val favoriteImageVector = if (isFavorited.value) {
-        ImageVector.vectorResource(id = R.drawable.ic_favorited)
-    } else {
-        ImageVector.vectorResource(id = R.drawable.ic_unfavoried)
-    }
-    if (isLoading.value) {
-        DialogProgress(isLoading.value)
-    } else {
-        Box(
-            contentAlignment = Alignment.Center,
-        ) {
-            val painter = rememberAsyncImagePainter(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(photoUrl.value)
-                    .crossfade(true)
-                    .placeholder(R.drawable.image_place_holder)
-                    .error(R.drawable.image_load_error)
-                    .build()
-            )
 
-            Image(
-                painter = painter,
-                contentDescription = "Example Image",
-                contentScale = ContentScale.FillHeight,
-                modifier = Modifier
-                    .clickable { showingDetails.value = !showingDetails.value }
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            )
-            if (showingDetails.value) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.onBackground)
-                            .fillMaxWidth()
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackState)
+        }
+    ) {
+        DialogDownloadProgress(isDownloadingImage.value)
+        if (isLoading.value) {
+            DialogProgress(isLoading.value)
+        } else {
+            Box(
+                contentAlignment = Alignment.Center,
+            ) {
+                val painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(photoUrl.value)
+                        .crossfade(true)
+                        .placeholder(R.drawable.image_place_holder)
+                        .error(R.drawable.image_load_error)
+                        .build()
+                )
+
+                Image(
+                    painter = painter,
+                    contentDescription = "Example Image",
+                    contentScale = ContentScale.FillHeight,
+                    modifier = Modifier
+                        .clickable { showingDetails.value = !showingDetails.value }
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                )
+
+                if (showingDetails.value) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        BodyText(
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
+                                .background(MaterialTheme.colorScheme.onBackground)
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                            "by ${photographer.value}",
-                            textColor = Color.White,
-                            TextAlign.Center
-                        )
-                    }
+                        ) {
+                            BodyText(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                "by ${photographer.value}",
+                                textColor = Color.White,
+                                TextAlign.Center
+                            )
+                        }
 
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.onBackground)
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { },
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_download_image),
-                            contentDescription = "Download Image"
-                        )
-                        Image(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable {
-                                    if (!isFavorited.value) {
-                                        val favoritePhotos =
-                                            viewModel
-                                                .getListFromPref()
-                                                .toMutableList()
-                                        favoritePhotos.add(photoId)
-                                        viewModel.setFavoritePhotoIdsToPref(favoritePhotos) { success ->
-                                            if (success) {
-                                                isFavorited.value = true
-                                                println("Success!")
-                                            }
+                        ActionButtons(
+                            isFavorited,
+                            onDownloadClick = {
+                                val isFileExist =
+                                    viewModel.fileExistsInMediaStore(context, fileName)
+                                if (isFileExist) {
+                                    snackScope.launch {
+                                        snackState.showSnackbar(
+                                            "File already exists check your gallery!",
+                                            duration = SnackbarDuration.Short,
+                                            withDismissAction = true
+                                        )
+                                    }
+                                } else {
+                                    isDownloadingImage.value = true
+                                    viewModel.downloadImageWithCoil(
+                                        context,
+                                        photoUrl.value,
+                                        fileName
+                                    ) { _, message ->
+                                        snackScope.launch {
+                                            snackState.showSnackbar(
+                                                message,
+                                                duration = SnackbarDuration.Indefinite,
+                                                withDismissAction = true
+                                            )
                                         }
-                                    } else {
-                                        val favoritePhotos =
-                                            viewModel
-                                                .getListFromPref()
-                                                .toMutableList()
-                                        favoritePhotos.remove(photoId)
-                                        viewModel.setFavoritePhotoIdsToPref(favoritePhotos) { success ->
-                                            if (success) {
-                                                isFavorited.value = false
-                                                println("Success!")
-                                            }
+                                        isDownloadingImage.value = false
+                                    }
+                                }
+                            },
+                            onFavoriteClick = {
+                                val favoritePhotos =
+                                    viewModel
+                                        .getListFromPref()
+                                        .toMutableList()
+                                val message = if (!isFavorited.value) {
+                                    favoritePhotos.add(photoId)
+                                    "The photo added to your favorites!"
+                                } else {
+                                    favoritePhotos.remove(photoId)
+                                    "The photo removed from your favorites!"
+                                }
+                                viewModel.setFavoritePhotoIdsToPref(favoritePhotos) { success ->
+                                    if (success) {
+                                        isFavorited.value = !isFavorited.value
+                                        snackScope.launch {
+                                            snackState.showSnackbar(
+                                                message,
+                                                duration = SnackbarDuration.Short,
+                                                withDismissAction = true
+                                            )
                                         }
                                     }
-                                },
-                            imageVector = favoriteImageVector,
-                            contentDescription = "Add to Favorite"
+                                }
+                            }
                         )
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ActionButtons(
+    isFavorited: MutableState<Boolean>,
+    onDownloadClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
+) {
+    val favoriteImageVector = if (isFavorited.value) {
+        ImageVector.vectorResource(id = R.drawable.ic_favorited)
+    } else {
+        ImageVector.vectorResource(id = R.drawable.ic_unfavoried)
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.onBackground)
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Image(
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onDownloadClick),
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_download_image),
+            contentDescription = "Download Image"
+        )
+        Image(
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onFavoriteClick),
+            imageVector = favoriteImageVector,
+            contentDescription = "Add to Favorite"
+        )
     }
 }
