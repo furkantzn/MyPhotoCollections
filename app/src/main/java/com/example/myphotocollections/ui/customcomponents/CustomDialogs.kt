@@ -49,16 +49,3 @@ fun DialogDownloadProgress(isLoading: Boolean) {
         }
     }
 }
-
-@Composable
-fun ShowResultWithSnack(message:String) {
-
-    val snackState = remember { SnackbarHostState() }
-    val snackScope = rememberCoroutineScope()
-
-    SnackbarHost(hostState = snackState, Modifier)
-
-    fun launchSnackBar() {
-        snackScope.launch { snackState.showSnackbar(message) }
-    }
-}

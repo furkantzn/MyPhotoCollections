@@ -15,8 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,54 +24,49 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.myphotocollections.ui.customcomponents.DialogProgress
 import com.example.myphotocollections.ui.customcomponents.GradientText
 import com.example.myphotocollections.ui.listItems.CategoryCardItem
 import com.example.myphotocollections.ui.viewmodel.NavigationViewModel
 
 @Composable
 fun CategoriesPage(navController: NavController, viewModel: NavigationViewModel = viewModel()) {
-    val isLoading = remember { mutableStateOf(false) }
     val categories by viewModel.categoryMap.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        if(!viewModel.isCategoriesLoaded){
-            loadCategories(viewModel,context)
+        if (!viewModel.isCategoriesLoaded) {
+            loadCategories(viewModel, context)
         }
     }
-    if (isLoading.value) {
-        DialogProgress(isLoading.value)
-    } else {
-        Column(
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally,
+
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        GradientText(
+            text = "Categories",
+            textAlign = TextAlign.Start,
             modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        ) {
-            GradientText(
-                text = "Categories",
-                textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .padding(16.dp, 16.dp, 32.dp, 8.dp)
-                    .fillMaxWidth()
-            )
-            LazyVerticalGrid(
-                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
-                columns = GridCells.Fixed(2),
-                content = {
-                    items(categories.size) { index ->
-                        val categoryName = categories.keys.elementAt(index)
-                        val photoUrl = categories[categoryName]
-                        CategoryCardItem(
-                            navController,
-                            categoryName,
-                            photoUrl!!
-                        )
-                    }
+                .padding(16.dp, 16.dp, 32.dp, 8.dp)
+                .fillMaxWidth()
+        )
+        LazyVerticalGrid(
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
+            columns = GridCells.Fixed(2),
+            content = {
+                items(categories.size) { index ->
+                    val categoryName = categories.keys.elementAt(index)
+                    val photoUrl = categories[categoryName]
+                    CategoryCardItem(
+                        navController,
+                        categoryName,
+                        photoUrl!!
+                    )
                 }
-            )
-        }
+            }
+        )
     }
 }
 
@@ -83,10 +76,10 @@ private fun loadCategories(
 ) {
     viewModel.initCategoriesFromJson(context) { success ->
         if (success) {
-            viewModel.initCategoryPhotos {isSuccess->
-                if(isSuccess){
+            viewModel.initCategoryPhotos { isSuccess ->
+                if (isSuccess) {
                     println("Category loaded successfully!")
-                }else{
+                } else {
                     println("Failed to load the category!")
                 }
             }
@@ -98,5 +91,5 @@ private fun loadCategories(
 @Composable
 fun CategoriesPagePreview() {
     val navController = rememberNavController()
-    HomePage(navController,viewModel())
+    HomePage(navController, viewModel())
 }

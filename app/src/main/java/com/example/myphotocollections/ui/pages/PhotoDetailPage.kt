@@ -1,7 +1,6 @@
 package com.example.myphotocollections.ui.pages
 
 import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,18 +13,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +40,6 @@ import com.example.myphotocollections.R
 import com.example.myphotocollections.ui.customcomponents.BodyText
 import com.example.myphotocollections.ui.customcomponents.DialogDownloadProgress
 import com.example.myphotocollections.ui.customcomponents.DialogProgress
-import com.example.myphotocollections.ui.customcomponents.ShowResultWithSnack
 import com.example.myphotocollections.ui.viewmodel.PhotoDetailPageViewModel
 import kotlinx.coroutines.launch
 
@@ -54,30 +51,30 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
     val isLoading = remember { mutableStateOf(false) }
     val context = LocalContext.current
     val fileName = "${photoId}.jpg"
-    val photoUrl = remember {
+    var photoUrl by remember {
         mutableStateOf("")
     }
-    val photographer = remember {
+    var photographer by remember {
         mutableStateOf("")
     }
-    val isFavorited = remember {
+    var isFavorited by remember {
         mutableStateOf(false)
     }
-    val showingDetails = remember {
+    var showingDetails by remember {
         mutableStateOf(true)
     }
-    val isDownloadingImage = remember {
+    var isDownloadingImage by remember {
         mutableStateOf(false)
     }
 
     LaunchedEffect(photoId) {
         isLoading.value = true
-        isFavorited.value = viewModel.getListFromPref().contains(photoId)
+        isFavorited = viewModel.getListFromPref().contains(photoId)
         viewModel.getPhotoDetail(photoId) { success, photo ->
             if (success) {
                 if (photo != null) {
-                    photoUrl.value = photo.src.portrait
-                    photographer.value = photo.photographer
+                    photoUrl = photo.src.portrait
+                    photographer = photo.photographer
                 }
             } else {
                 snackScope.launch {
@@ -97,7 +94,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
             SnackbarHost(hostState = snackState)
         }
     ) {
-        DialogDownloadProgress(isDownloadingImage.value)
+        DialogDownloadProgress(isDownloadingImage)
         if (isLoading.value) {
             DialogProgress(isLoading.value)
         } else {
@@ -106,7 +103,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
             ) {
                 val painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(photoUrl.value)
+                        .data(photoUrl)
                         .crossfade(true)
                         .placeholder(R.drawable.image_place_holder)
                         .error(R.drawable.image_load_error)
@@ -118,12 +115,12 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                     contentDescription = "Example Image",
                     contentScale = ContentScale.FillHeight,
                     modifier = Modifier
-                        .clickable { showingDetails.value = !showingDetails.value }
+                        .clickable { showingDetails = !showingDetails }
                         .fillMaxWidth()
                         .fillMaxHeight()
                 )
 
-                if (showingDetails.value) {
+                if (showingDetails) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.SpaceBetween
@@ -139,7 +136,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(16.dp),
-                                "by ${photographer.value}",
+                                "by $photographer",
                                 textColor = Color.White,
                                 TextAlign.Center
                             )
@@ -159,10 +156,10 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                                         )
                                     }
                                 } else {
-                                    isDownloadingImage.value = true
+                                    isDownloadingImage = true
                                     viewModel.downloadImageWithCoil(
                                         context,
-                                        photoUrl.value,
+                                        photoUrl,
                                         fileName
                                     ) { _, message ->
                                         snackScope.launch {
@@ -172,7 +169,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                                                 withDismissAction = true
                                             )
                                         }
-                                        isDownloadingImage.value = false
+                                        isDownloadingImage = false
                                     }
                                 }
                             },
@@ -181,7 +178,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                                     viewModel
                                         .getListFromPref()
                                         .toMutableList()
-                                val message = if (!isFavorited.value) {
+                                val message = if (!isFavorited) {
                                     favoritePhotos.add(photoId)
                                     "The photo added to your favorites!"
                                 } else {
@@ -190,7 +187,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                                 }
                                 viewModel.setFavoritePhotoIdsToPref(favoritePhotos) { success ->
                                     if (success) {
-                                        isFavorited.value = !isFavorited.value
+                                        isFavorited = !isFavorited
                                         snackScope.launch {
                                             snackState.showSnackbar(
                                                 message,
@@ -211,11 +208,11 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
 
 @Composable
 fun ActionButtons(
-    isFavorited: MutableState<Boolean>,
+    isFavorited: Boolean,
     onDownloadClick: () -> Unit,
     onFavoriteClick: () -> Unit,
 ) {
-    val favoriteImageVector = if (isFavorited.value) {
+    val favoriteImageVector = if (isFavorited) {
         ImageVector.vectorResource(id = R.drawable.ic_favorited)
     } else {
         ImageVector.vectorResource(id = R.drawable.ic_unfavoried)
