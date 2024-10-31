@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,21 +29,23 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myphotocollections.ui.customcomponents.DialogProgress
 import com.example.myphotocollections.ui.customcomponents.GradientText
 import com.example.myphotocollections.ui.listItems.CategoryCardItem
-import com.example.myphotocollections.ui.viewmodel.CategoriesPageViewModel
+import com.example.myphotocollections.ui.viewmodel.NavigationViewModel
 
 @Composable
-fun CategoriesPage(navController: NavController, viewModel: CategoriesPageViewModel = viewModel()) {
+fun CategoriesPage(navController: NavController, viewModel: NavigationViewModel = viewModel()) {
     val isLoading = remember { mutableStateOf(false) }
     val categories by viewModel.categoryMap.collectAsState()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        loadCategories(viewModel, isLoading, context)
+        if(!viewModel.isCategoriesLoaded){
+            loadCategories(viewModel,context)
+        }
     }
     if (isLoading.value) {
         DialogProgress(isLoading.value)
     } else {
         Column(
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
@@ -77,18 +78,19 @@ fun CategoriesPage(navController: NavController, viewModel: CategoriesPageViewMo
 }
 
 private fun loadCategories(
-    viewModel: CategoriesPageViewModel,
-    isLoading: MutableState<Boolean>,
+    viewModel: NavigationViewModel,
     context: Context
 ) {
-    isLoading.value = true
     viewModel.initCategoriesFromJson(context) { success ->
         if (success) {
-            viewModel.initPhotos {
-                println("Success set to category map")
+            viewModel.initCategoryPhotos {isSuccess->
+                if(isSuccess){
+                    println("Category loaded successfully!")
+                }else{
+                    println("Failed to load the category!")
+                }
             }
         }
-        isLoading.value = false
     }
 }
 
@@ -96,5 +98,5 @@ private fun loadCategories(
 @Composable
 fun CategoriesPagePreview() {
     val navController = rememberNavController()
-    HomePage(navController)
+    HomePage(navController,viewModel())
 }

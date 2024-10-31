@@ -30,22 +30,24 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myphotocollections.ui.customcomponents.DialogProgress
 import com.example.myphotocollections.ui.customcomponents.GradientText
 import com.example.myphotocollections.ui.listItems.PhotoCardItem
-import com.example.myphotocollections.ui.viewmodel.HomePageViewModel
+import com.example.myphotocollections.ui.viewmodel.NavigationViewModel
 
 @Composable
-fun HomePage(navController: NavController, viewModel: HomePageViewModel = viewModel()) {
-    val photos by viewModel.photos.collectAsState()
+fun HomePage(navController: NavController, viewModel: NavigationViewModel) {
+    val trendingPhotos by viewModel.trendingPhotos.collectAsState()
     val currentPage = remember { mutableStateOf(1) }
     val isLoading = remember { mutableStateOf(false) }
     val gridState = rememberLazyGridState()
-    LaunchedEffect(Unit) {
-        loadPageData(viewModel,currentPage.value,isLoading)
+    LaunchedEffect (Unit){
+        if(!viewModel.isTrendingLoaded){
+            loadPageData(viewModel,1,isLoading)
+        }
     }
     if (isLoading.value) {
         DialogProgress(isLoading.value)
     } else {
         Column(
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
@@ -63,10 +65,10 @@ fun HomePage(navController: NavController, viewModel: HomePageViewModel = viewMo
                 columns = GridCells.Fixed(2),
                 state = gridState,
                 content = {
-                    items(photos.size) { index ->
+                    items(trendingPhotos.size) { index ->
                         PhotoCardItem(
                             navController,
-                            photo = photos[index]
+                            photo = trendingPhotos[index]
                         )
                     }
                 }
@@ -75,7 +77,7 @@ fun HomePage(navController: NavController, viewModel: HomePageViewModel = viewMo
             LaunchedEffect(gridState) {
                 snapshotFlow { gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
                     .collect { lastVisibleItemIndex ->
-                        if (lastVisibleItemIndex == photos.size - 1 && !isLoading.value) {
+                        if (lastVisibleItemIndex == trendingPhotos.size - 1 && !isLoading.value) {
                             currentPage.value++
                             loadPageData(viewModel,currentPage.value)
                         }
@@ -85,9 +87,9 @@ fun HomePage(navController: NavController, viewModel: HomePageViewModel = viewMo
     }
 }
 
-private fun loadPageData(viewModel: HomePageViewModel, page: Int, isLoading: MutableState<Boolean> = mutableStateOf(false)) {
+private fun loadPageData(viewModel: NavigationViewModel, page: Int, isLoading: MutableState<Boolean> = mutableStateOf(false)) {
     isLoading.value = true
-    viewModel.initPhotos(page) { success ->
+    viewModel.initTrendingPhotos(page) { success ->
         if (success) {
             println("Page $page loaded successfully!")
         } else {
@@ -101,5 +103,5 @@ private fun loadPageData(viewModel: HomePageViewModel, page: Int, isLoading: Mut
 @Composable
 fun HomePagePreview() {
     val navController = rememberNavController()
-    HomePage(navController)
+    HomePage(navController,viewModel())
 }

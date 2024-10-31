@@ -1,5 +1,8 @@
 package com.example.myphotocollections.ui.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.myphotocollections.data.models.Photo
 import com.example.myphotocollections.data.models.PhotosResponse
@@ -13,7 +16,10 @@ import retrofit2.Response
 class CategoryDetailPageViewModel:ViewModel() {
     private val _photos = MutableStateFlow<List<Photo>>(emptyList())
     val photos: StateFlow<List<Photo>> = _photos
-    fun initPhotos(query:String,page: Int = 1, perPage: Int = 15, onComplete: (Boolean) -> Unit) {
+
+    var isCategoriesDetailLoaded by mutableStateOf(false)
+        private set
+    fun initPhotos(query:String,page: Int = 1, perPage: Int = 10, onComplete: (Boolean) -> Unit) {
         val call = RetrofitInstance.apiService.searchPhotos(query,page, perPage)
 
         call.enqueue(object : Callback<PhotosResponse> {
@@ -22,17 +28,20 @@ class CategoryDetailPageViewModel:ViewModel() {
                 response: Response<PhotosResponse>
             ) {
                 if (response.isSuccessful) {
-                    onComplete(true)
                     val photosResponse = response.body()
                     photosResponse?.photos?.let { addPhotos(it) }
+                    isCategoriesDetailLoaded = true
+                    onComplete(true)
                 } else {
                     println("Response was not successful: ${response.code()}")
+                    isCategoriesDetailLoaded = false
                     onComplete(false)
                 }
             }
 
             override fun onFailure(call: Call<PhotosResponse>, t: Throwable) {
                 println("Failed to fetch photos: ${t.message}")
+                isCategoriesDetailLoaded = false
                 onComplete(false)
             }
         })

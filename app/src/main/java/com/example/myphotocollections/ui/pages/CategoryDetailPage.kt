@@ -39,7 +39,9 @@ fun CategoryDetailPage(navController: NavController,categoryName:String,viewMode
     val isLoading = remember { mutableStateOf(false) }
     val gridState = rememberLazyGridState()
     LaunchedEffect(Unit) {
-        loadPageData(viewModel,currentPage.value,categoryName,isLoading)
+        if(!viewModel.isCategoriesDetailLoaded){
+            loadPageData(viewModel,currentPage.value,categoryName,isLoading)
+        }
     }
     if (isLoading.value) {
         DialogProgress(isLoading.value)

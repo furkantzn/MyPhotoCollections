@@ -1,7 +1,5 @@
 package com.example.myphotocollections.ui.pages
 
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,15 +13,12 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,22 +28,21 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myphotocollections.ui.customcomponents.DialogProgress
 import com.example.myphotocollections.ui.customcomponents.GradientText
 import com.example.myphotocollections.ui.listItems.PhotoCardItem
-import com.example.myphotocollections.ui.viewmodel.FavoritesPageViewModel
-import com.example.myphotocollections.ui.viewmodel.HomePageViewModel
+import com.example.myphotocollections.ui.viewmodel.NavigationViewModel
 
 @Composable
-fun FavoritesPage(navController: NavController, viewModel: FavoritesPageViewModel = viewModel()) {
-    val photos by viewModel.photos.collectAsState()
+fun FavoritesPage(navController: NavController, viewModel: NavigationViewModel = viewModel()) {
+    val favoritePhotos by viewModel.favoritePhotos.collectAsState()
     val isLoading = remember { mutableStateOf(false) }
     val gridState = rememberLazyGridState()
-    LaunchedEffect(Unit) {
-        loadData(viewModel,isLoading)
+    LaunchedEffect (Unit){
+        loadPhotoIds(viewModel)
     }
     if (isLoading.value) {
         DialogProgress(isLoading.value)
     } else {
         Column(
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
@@ -66,10 +60,10 @@ fun FavoritesPage(navController: NavController, viewModel: FavoritesPageViewMode
                 columns = GridCells.Fixed(2),
                 state = gridState,
                 content = {
-                    items(photos.size) { index ->
+                    items(favoritePhotos.size) { index ->
                         PhotoCardItem(
                             navController,
-                            photo = photos[index]
+                            photo = favoritePhotos[index]
                         )
                     }
                 }
@@ -78,19 +72,23 @@ fun FavoritesPage(navController: NavController, viewModel: FavoritesPageViewMode
     }
 }
 
-private fun loadData(viewModel: FavoritesPageViewModel, isLoading: MutableState<Boolean> = mutableStateOf(false)) {
-    isLoading.value = true
-    viewModel.initFavoritePhotos{success->
+private fun loadFavoritePhotos(viewModel: NavigationViewModel) {
+    viewModel.initFavoritePhotos { isSuccess ->
+        if (isSuccess) {
+            println("Photo loaded successfully!")
+        } else {
+            println("Failed to load the photo!")
+        }
+    }
+}
+
+private fun loadPhotoIds(viewModel: NavigationViewModel){
+    viewModel.initFavoritePhotoIds{success->
         if(success){
-            viewModel.initPhotos { success ->
-                if (success) {
-                    println("Photo loaded successfully!")
-                } else {
-                    println("Failed to load data")
-                }
+            if(!viewModel.allItemsIdentical()){
+                    loadFavoritePhotos(viewModel)
             }
         }
-        isLoading.value = false
     }
 }
 
