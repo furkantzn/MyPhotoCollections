@@ -105,7 +105,7 @@ fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewMode
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(photoUrl)
                         .crossfade(true)
-                        .placeholder(R.drawable.image_place_holder)
+                        .placeholder(R.drawable.ic_image_item_download)
                         .error(R.drawable.image_load_error)
                         .build()
                 )
