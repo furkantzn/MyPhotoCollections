@@ -1,4 +1,4 @@
-package com.example.myphotocollections.ui.customcomponents
+package com.example.myphotocollections.ui.view.customcomponents
 
 import android.content.Context
 import android.net.ConnectivityManager

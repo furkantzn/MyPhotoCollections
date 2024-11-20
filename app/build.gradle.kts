@@ -4,6 +4,8 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -91,18 +93,18 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Material Design 3
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.compose.material3.adaptive:adaptive")
+    implementation(libs.androidx.material3)
+    implementation(libs.material.icons.extended)
+    implementation(libs.androidx.material3.adaptive)
     // Android Studio Preview support
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation(libs.androidx.ui.tooling.preview)
+    debugImplementation(libs.androidx.ui.tooling)
 
     // Optional - Integration with ViewModels
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation(libs.androidx.lifecycle)
 
     // Optional - Integration with activities
-    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation(libs.androidx.activity.compose)
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //Retrofit
@@ -113,6 +115,11 @@ dependencies {
     implementation(libs.coil)
 
     //Lottie
-    implementation("com.airbnb.android:lottie-compose:4.0.0")
+    implementation(libs.lottie)
+
+    //Hilt
+    implementation(libs.hilt)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation)
 
 }

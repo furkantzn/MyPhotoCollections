@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.myphotocollections.ui.pages.CategoryDetailPage
-import com.example.myphotocollections.ui.pages.NavigationPage
-import com.example.myphotocollections.ui.pages.PhotoDetailPage
+import com.example.myphotocollections.ui.view.pages.CategoryDetailPage
+import com.example.myphotocollections.ui.view.pages.NavigationPage
+import com.example.myphotocollections.ui.view.pages.PhotoDetailPage
 
 @Composable
 fun SetUpNavHost(navController: NavHostController){

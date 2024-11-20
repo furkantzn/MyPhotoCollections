@@ -13,6 +13,7 @@ MyPhotoCollections App is an Android application that allows users to explore an
 - **Programming Language**: Kotlin
 - **UI Framework**: [Jetpack Compose](https://developer.android.com/compose)
 - **Architecture Pattern**: MVVM (Model-View-ViewModel)
+- **Dependency Injection**: Hilt
 - **Image Loading**: [Coil](https://github.com/coil-kt/coil)
 - **Network**: [Retrofit2](https://square.github.io/retrofit/)
 - **API**: [Pexels API](https://www.pexels.com/api/)
@@ -37,6 +38,7 @@ MyPhotoCollections App is an Android application that allows users to explore an
 - **Retrofit2:** For making HTTP requests to the PExels API.
 - **Coil:** For efficient image loading and caching.
 - **Kotlin Coroutines:** For asynchronous programming and managing API calls.
+- **Lottie:** Used for animated icons.
 
 ## Screenshots
 <p>

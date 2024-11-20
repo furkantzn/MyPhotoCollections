@@ -1,4 +1,4 @@
-package com.example.myphotocollections.data.services
+package com.example.myphotocollections.utils
 
 import android.content.Context
 import android.content.SharedPreferences

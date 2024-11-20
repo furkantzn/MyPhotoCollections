@@ -1,4 +1,4 @@
-package com.example.myphotocollections.ui.pages
+package com.example.myphotocollections.ui.view.pages
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
@@ -33,19 +33,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.myphotocollections.R
-import com.example.myphotocollections.ui.customcomponents.BodyText
-import com.example.myphotocollections.ui.customcomponents.DialogDownloadProgress
-import com.example.myphotocollections.ui.customcomponents.DialogProgress
+import com.example.myphotocollections.ui.view.customcomponents.BodyText
+import com.example.myphotocollections.ui.view.customcomponents.DialogDownloadProgress
+import com.example.myphotocollections.ui.view.customcomponents.DialogProgress
 import com.example.myphotocollections.ui.viewmodel.PhotoDetailPageViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = viewModel()) {
+fun PhotoDetailPage(photoId: Int, viewModel: PhotoDetailPageViewModel = hiltViewModel()) {
     val snackState = remember { SnackbarHostState() }
     val snackScope = rememberCoroutineScope()
     val isLoading = remember { mutableStateOf(false) }

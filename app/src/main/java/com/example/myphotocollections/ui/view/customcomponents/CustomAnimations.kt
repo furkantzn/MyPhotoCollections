@@ -1,4 +1,4 @@
-package com.example.myphotocollections.ui.customcomponents
+package com.example.myphotocollections.ui.view.customcomponents
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue

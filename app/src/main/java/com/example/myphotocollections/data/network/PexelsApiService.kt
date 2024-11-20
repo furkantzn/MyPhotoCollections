@@ -1,8 +1,8 @@
-package com.example.myphotocollections.data.services
+package com.example.myphotocollections.data.network
 
 import com.example.myphotocollections.BuildConfig
-import com.example.myphotocollections.data.models.Photo
-import com.example.myphotocollections.data.models.PhotosResponse
+import com.example.myphotocollections.data.model.Photo
+import com.example.myphotocollections.data.model.PhotosResponse
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Header

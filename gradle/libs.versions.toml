@@ -17,7 +17,12 @@ navigationCompose = "2.8.3"
 retrofit = "2.10.0"
 coil = "2.2.2"
 coreSplashscreen = "1.0.1"
+lifeCycle = "2.8.5"
+lottie = "4.0.0"
+hilt = "2.51.1"
+hilt-navigation = "1.0.0"
 [libraries]
+androidx-lifecycle = {group = "androidx.lifecycle",name = "lifecycle-viewmodel-compose",version.ref = "lifeCycle" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -35,6 +40,8 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive" }
+material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
@@ -42,6 +49,10 @@ retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = 
 gson = {group = "com.squareup.retrofit2",name="converter-gson",version.ref="retrofit"}
 coil = {group="io.coil-kt",name="coil-compose",version.ref="coil"}
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
+lottie = {group = "com.airbnb.android", name="lottie-compose",version.ref="lottie"}
+hilt = {group = "com.google.dagger",name = "hilt-android",version.ref = "hilt"}
+hilt-android-compiler = {group = "com.google.dagger",name = "hilt-android-compiler",version.ref = "hilt"}
+androidx-hilt-navigation = {group = "androidx.hilt",name = "hilt-navigation-compose",version.ref = "hilt-navigation"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

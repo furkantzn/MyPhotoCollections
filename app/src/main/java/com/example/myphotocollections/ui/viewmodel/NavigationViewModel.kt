@@ -5,22 +5,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.example.myphotocollections.data.models.Category
-import com.example.myphotocollections.data.models.Photo
-import com.example.myphotocollections.data.models.PhotosResponse
-import com.example.myphotocollections.data.retrofit.RetrofitInstance
-import com.example.myphotocollections.data.services.SharedPrefManager
+import androidx.lifecycle.viewModelScope
+import com.example.myphotocollections.data.model.Category
+import com.example.myphotocollections.data.model.Photo
+import com.example.myphotocollections.data.repository.PexelsRepository
+import com.example.myphotocollections.utils.SharedPrefManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.toList
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
+import javax.inject.Inject
 
-open class NavigationViewModel:ViewModel() {
+@HiltViewModel
+open class NavigationViewModel @Inject constructor(
+    private val pexelsRepository: PexelsRepository
+):ViewModel() {
     private val _trendingPhotos = MutableStateFlow<List<Photo>>(emptyList())
     val trendingPhotos: StateFlow<List<Photo>> = _trendingPhotos
 
@@ -39,12 +43,9 @@ open class NavigationViewModel:ViewModel() {
         private set
 
     fun initTrendingPhotos(page: Int = 1, perPage: Int = 10, onComplete: (Boolean) -> Unit) {
-        val call = RetrofitInstance.apiService.getTrendingPhotos(page, perPage)
-        call.enqueue(object : Callback<PhotosResponse> {
-            override fun onResponse(
-                call: Call<PhotosResponse>,
-                response: Response<PhotosResponse>
-            ) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                val response = pexelsRepository.fetchTrendingPhotos(page,perPage)
                 if (response.isSuccessful) {
                     val photosResponse = response.body()
                     photosResponse?.photos?.let { addTrendingPhotos(it) }
@@ -56,22 +57,15 @@ open class NavigationViewModel:ViewModel() {
                     onComplete(false)
                 }
             }
-
-            override fun onFailure(call: Call<PhotosResponse>, t: Throwable) {
-                isTrendingLoaded = false
-                println("Failed to fetch photos: ${t.message}")
-                onComplete(false)
-            }
-        })
+        }
     }
 
-    fun addTrendingPhotos(photos:List<Photo>){
+    private fun addTrendingPhotos(photos:List<Photo>){
         val updatedList = _trendingPhotos.value.toMutableList()
         updatedList.addAll(photos)
         _trendingPhotos.value = updatedList
     }
 
-    //Categories
     fun initCategoriesFromJson(context: Context, onComplete: (Boolean) -> Unit) {
         try {
             val jsonString = getCategoryJsonDataFromAsset(context)
@@ -87,13 +81,9 @@ open class NavigationViewModel:ViewModel() {
     fun initCategoryPhotos(onComplete: (Boolean) -> Unit){
         val updatedCategoryMap = _categoryMap.value.toMutableMap()
         for (category in categories){
-            val call = RetrofitInstance.apiService.getPhotoDetail(category.photoId)
-
-            call.enqueue(object : Callback<Photo> {
-                override fun onResponse(
-                    call: Call<Photo>,
-                    response: Response<Photo>
-                ) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO){
+                    val response = pexelsRepository.getPhotoDetails(category.photoId)
                     if (response.isSuccessful) {
                         val photo = response.body()
                         if (photo != null) {
@@ -109,13 +99,7 @@ open class NavigationViewModel:ViewModel() {
                         onComplete(false)
                     }
                 }
-
-                override fun onFailure(call: Call<Photo>, t: Throwable) {
-                    println("Failed to fetch photo: ${t.message}")
-                    isCategoriesLoaded = false
-                    onComplete(false)
-                }
-            })
+            }
         }
     }
 
@@ -150,13 +134,9 @@ open class NavigationViewModel:ViewModel() {
     fun initFavoritePhotos(onComplete: (Boolean) -> Unit){
         _favoritePhotos.value = emptyList()
         for (photoId in favoritePhotoIds){
-            val call = RetrofitInstance.apiService.getPhotoDetail(photoId.toInt())
-
-            call.enqueue(object : Callback<Photo> {
-                override fun onResponse(
-                    call: Call<Photo>,
-                    response: Response<Photo>
-                ) {
+            viewModelScope.launch {
+                withContext(Dispatchers.IO){
+                    val response = pexelsRepository.getPhotoDetails(photoId.toInt())
                     if (response.isSuccessful) {
                         val photo = response.body()
                         if (photo != null) {
@@ -169,16 +149,11 @@ open class NavigationViewModel:ViewModel() {
                         onComplete(false)
                     }
                 }
-
-                override fun onFailure(call: Call<Photo>, t: Throwable) {
-                    println("Failed to fetch photo: ${t.message}")
-                    onComplete(false)
-                }
-            })
+            }
         }
     }
 
-    fun addPhoto(photo:Photo){
+    private fun addPhoto(photo:Photo){
         val updatedList = _favoritePhotos.value.toMutableList()
         updatedList.add(photo)
         _favoritePhotos.value = updatedList
